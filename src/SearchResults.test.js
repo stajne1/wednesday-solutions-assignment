@@ -1,12 +1,8 @@
 import React from 'react';
-import App from './App';
 import { shallow } from 'enzyme';
-import { createStore } from 'redux';
-import { rootReducer } from './reducer';
-import { Input, Spin, Alert } from 'antd';
 import SearchResults from './SearchResults';
-
-const { Search } = Input;
+import { Col, Row, Card } from 'antd';
+const { Meta } = Card;
 
 const songs = [
   {
@@ -32,43 +28,29 @@ const songs = [
   }
 ];
 
-const initialState = {
-  isFetching: false,
-  songs,
-  error: ''
+const setup = () => {
+  return shallow(<SearchResults songs={songs} />);
 }
 
-
-const setup = (initialState = {}) => {
-  const store = createStore(rootReducer, initialState);
-  const wrapper = shallow(<App store={store} />).dive().dive();
-  return wrapper;
-}
-
-describe('App Component', () => {
+describe('SearchResults Comonent', () => {
   let wrapper = null;
   beforeEach(() => {
-    wrapper = setup(initialState);
+    wrapper = setup();
+  });
+  
+  it('Should render a row component without errors', () => {
+    expect(wrapper.find(Row).length).toBe(1);
   });
 
-  it('Should render Search Component without errors', () => {
-    expect(wrapper.find(Search).length).toBe(1);
+  it('Should render the columns equal to the songs received in props', () => {
+    expect(wrapper.find(Col).length).toBe(songs.length);
   });
 
-  it('Should render Alert only when there is an error in props', () => {
-    expect(wrapper.find(Alert).length).toBe(0);
-    wrapper = setup({ ...initialState, error: 'something went wrong' });
-    expect(wrapper.find(Alert).length).toBe(1);
+  it('Should render the cards equal to the songs received in props', () => {
+    expect(wrapper.find(Card).length).toBe(songs.length);
   });
 
-  it("Should render Spinner only when the isFetching prop is true", () => {
-    expect(wrapper.find(Spin).length).toBe(0);
-    wrapper = setup({ ...initialState, isFetching: true });
-    expect(wrapper.find(Spin).length).toBe(1);
-  });
-
-  it("Should render SearchResults Component when isFetching is false", () => {
-    expect(wrapper.find(Spin).length).toBe(0);
-    expect(wrapper.find(SearchResults).length).toBe(1);
+  it('Should render the song metadata equal to the songs received in props', () => {
+    expect(wrapper.find(Meta).length).toBe(songs.length);
   });
 });
